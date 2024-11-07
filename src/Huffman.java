@@ -2,49 +2,60 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import tester.Tester;
 
-
+// represents either one leaf or a forest
 abstract class ABranch {
   Integer frequency;
 
+  // constructor
   public ABranch(Integer frequency) {
     this.frequency = frequency;
   }
 
+  // adds this ABranch to a Forest at a position in the Forest
   public abstract void addToForest(int start, Forest forest);
 
+  // calculates the position of the Abranch to the left of the root
   int getLeft(int root) {
     return 1 + (2 * root);
   }
 
+  // calculates the position of the Abranch to the right of the root
   int getRight(int root) {
     return 2 + (2 * root);
   }
 
+  // checks if the this Abranch's frequency is less than the other Abranch
   public boolean isLessThan(ABranch other) {
     return other.isGreaterThanValue(this.frequency);
   }
 
+  // checks if the this Abranch's frequency is greater than a given value
   public boolean isGreaterThanValue(int value) {
     return this.frequency > value;
   }
 }
 
+// a letter with its frequencs
 class Leaf extends ABranch {
   String letter;
 
+  // constructor
   public Leaf(String letter, Integer frequency) {
     super(frequency);
     this.letter = letter;
   }
 
+  //adds this ABranch to a Forest at a position in the Forest
   public void addToForest(int start, Forest forest) {
     forest.insert(this, start);
   }
 }
 
+// a collection of leaves kept in list ordered to fit a tree based of frequency
 class Forest extends ABranch {
   ArrayList<Leaf> leaves;
 
+  // constructor
   public Forest(ABranch branch1, ABranch branch2) {
     super(branch1.frequency + branch2.frequency);
     leaves = new ArrayList<Leaf>();
@@ -53,6 +64,7 @@ class Forest extends ABranch {
     branch2.addToForest(2, this);
   }
 
+  
   public void insert(Leaf leaf, int index) {
     while (leaves.size() <= index) {
       leaves.add(null);
@@ -61,6 +73,7 @@ class Forest extends ABranch {
     leaves.set(index, leaf);
   }
 
+  // adds this ABranch to a Forest at a position in the Forest
   public void addToForest(int start, Forest forest) {
     doAddToForest(start, 0, forest);
   }
@@ -78,12 +91,14 @@ class Forest extends ABranch {
   }
 }
 
+//
 class Huffman {
   ArrayList<String> letters;
   ArrayList<Integer> frequencies;
 
   Forest cypher;
 
+  // constructor
   public Huffman(ArrayList<String> letters, ArrayList<Integer> frequencies) {
 
     if (letters.size() != frequencies.size()) {
@@ -101,7 +116,8 @@ class Huffman {
 
     this.cypher = mergeAll(branches);
   }
-
+  
+  // creates an Arraylist of ABranch that uses letters and frequencies
   public ArrayList<ABranch> generateBranchArray(ArrayList<String> letters,
       ArrayList<Integer> frequencies) {
 
@@ -116,6 +132,7 @@ class Huffman {
     return result;
   }
 
+  // puts a ABranch into a sorted list of sorted ABranches
   public void sortInto(ArrayList<ABranch> branches, ABranch newLeaf) {
     for (int i = 0; i < branches.size(); i++) {
       if (!branches.get(i).isLessThan(newLeaf)) {
@@ -126,6 +143,7 @@ class Huffman {
     branches.add(newLeaf);
   }
 
+  // combines all the ABranches in a list of ABranches into one Forest.
   public Forest mergeAll(ArrayList<ABranch> branches) {
     while (branches.size() > 2) {
       ABranch small0 = branches.remove(0);
@@ -140,6 +158,7 @@ class Huffman {
     return new Forest(small0, small1);
   }
 
+  // takes a string and converts it to binary where 0 is represented by false and 1 by true
   public ArrayList<Boolean> encode(String toEncode) {
     ArrayList<Boolean> encoded;
     for (int i = 0; i < toEncode.length(); i++) {
