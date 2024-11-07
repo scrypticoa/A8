@@ -252,23 +252,24 @@ class Huffman {
 
 // tests methods and objects
 class ExamplesHuffman {
-  
+
   boolean subForestsEqual(Forest a, int aHead, Forest b, int bHead) {
     Leaf aLeaf = a.leaves.get(aHead);
     Leaf bLeaf = b.leaves.get(bHead);
-    
+
     if (aLeaf != null && bLeaf != null) {
       return aLeaf.letterIs(bLeaf.letter);
     }
-    
+
     if ((aLeaf == null) != (bLeaf == null)) {
       return false;
     }
-    
-    if (!subForestsEqual(a, a.getLeft(aHead), b, b.getLeft(bHead))) return false;
+
+    if (!subForestsEqual(a, a.getLeft(aHead), b, b.getLeft(bHead)))
+      return false;
     return subForestsEqual(a, a.getRight(aHead), b, b.getRight(bHead));
   }
-  
+
   Leaf a = new Leaf("a", 8);
   Leaf b = new Leaf("b", 2);
   Leaf c = new Leaf("c", 3);
@@ -284,14 +285,10 @@ class ExamplesHuffman {
 
   ArrayList<String> aTof = new ArrayList<String>(Arrays.asList("a", "b", "c", "d", "e", "f"));
   ArrayList<Integer> aTofFre = new ArrayList<Integer>(Arrays.asList(8, 2, 3, 4, 13, 2));
-  
+
   Huffman abcdef = new Huffman(aTof, aTofFre);
-  /* a = 10
-   * b = 1100
-   * c = 1110
-   * d = 1111
-   * e = 0
-   * f = 1101
+  /*
+   * a = 10 b = 1100 c = 1110 d = 1111 e = 0 f = 1101
    */
   ArrayList<Boolean> aCode;
   ArrayList<Boolean> bCode;
@@ -299,14 +296,14 @@ class ExamplesHuffman {
   ArrayList<Boolean> dCode;
   ArrayList<Boolean> eCode;
   ArrayList<Boolean> fCode;
-  
+
   void codeCreate() {
-  aCode = new ArrayList<Boolean>(Arrays.asList(true, false));
-  bCode = new ArrayList<Boolean>(Arrays.asList(true, true, false, false));
-  cCode = new ArrayList<Boolean>(Arrays.asList(true, true, true, false));
-  dCode = new ArrayList<Boolean>(Arrays.asList(true, true, true, true));
-  eCode = new ArrayList<Boolean>(Arrays.asList(false));
-  fCode = new ArrayList<Boolean>(Arrays.asList(true, true, false, true));
+    aCode = new ArrayList<Boolean>(Arrays.asList(true, false));
+    bCode = new ArrayList<Boolean>(Arrays.asList(true, true, false, false));
+    cCode = new ArrayList<Boolean>(Arrays.asList(true, true, true, false));
+    dCode = new ArrayList<Boolean>(Arrays.asList(true, true, true, true));
+    eCode = new ArrayList<Boolean>(Arrays.asList(false));
+    fCode = new ArrayList<Boolean>(Arrays.asList(true, true, false, true));
   }
 
   // tests the getLeft method
@@ -360,8 +357,8 @@ class ExamplesHuffman {
     res &= t.checkExpect(a.isGreaterThanValue(10), false);
     return res;
   }
-  
-  //tests letterIs method
+
+  // tests letterIs method
   boolean testLetterIs(Tester t) {
     boolean res = true;
     // tests a false
@@ -370,117 +367,121 @@ class ExamplesHuffman {
     res &= t.checkExpect(a.letterIs("a"), true);
     return res;
   }
-  
+
   // tests the addToForest method
   boolean testAddToForest(Tester t) {
     boolean res = true;
-    
+
     // leaf test
-    
+
     Forest fCDCopy = new Forest(c, d);
-    
+
     a.addToForest(2, fCDCopy);
-    
+
     res &= t.checkExpect(fCDCopy.leaves.get(2), a);
-    
+
     // forest test
-    
+
     fBF.addToForest(1, fCDCopy);
-    
+
     res &= t.checkExpect(subForestsEqual(fCDCopy, 1, fBF, 0), true);
-    
+
     return res;
   }
 
   // tests the insert method
   boolean testInsert(Tester t) {
     boolean res = true;
-    
+
     // replace case
-    
+
     Forest fCDCopy = new Forest(c, d);
-    
+
     fCDCopy.insert(a, 1);
-    
+
     res &= t.checkExpect(fCDCopy.leaves.get(1), a);
-    
+
     // add blank nulls case
-    
+
     fCDCopy.insert(f, 5);
-    
+
     res &= t.checkExpect(fCDCopy.leaves.get(3), null);
     res &= t.checkExpect(fCDCopy.leaves.get(4), null);
     res &= t.checkExpect(fCDCopy.leaves.get(5), f);
-    
+
     return res;
   }
 
- //tests the encode method
- boolean testEncode(Tester t) {
-   boolean res = true;
-   // generic test
-   codeCreate();
-   cCode.addAll(aCode);
-   cCode.addAll(bCode);
-   res &= t.checkExpect(abcdef.encode("cab"), cCode);
-   // tests an illeal letter
-   res &= t.checkException(new IllegalArgumentException(
-       "Tried to encode r but that is not part of the language."), abcdef, "encode", "car");
-   // tests multiple illeal letter
-   res &= t.checkException(new IllegalArgumentException(
-       "Tried to encode r but that is not part of the language."), abcdef, "encode", "cars");
-   
-   return res;
- }
- 
- //tests the decode method in the Huffman class
- boolean testHuffmanDecode(Tester t) {
-   boolean res = true;
-   // generic test
-   codeCreate();
-   cCode.addAll(aCode);
-   cCode.addAll(bCode);
-   res &= t.checkExpect(abcdef.decode(cCode), "cab");
-   // tests adding a question mark at the end
-   codeCreate();
-   cCode.addAll(aCode);
-   cCode.addAll(bCode);
-   cCode.add(true);
-   res &= t.checkExpect(abcdef.decode(cCode), "cab?");
-   // using all letters
-   codeCreate();
-   dCode.addAll(eCode);
-   dCode.addAll(cCode);
-   dCode.addAll(aCode);
-   dCode.addAll(fCode);
-   cCode.add(true);
-   res &= t.checkExpect(abcdef.decode(cCode), "decaf?");
-   return res;
- }
- 
-//tests the decode method in the Forest class
-boolean testForestDecode(Tester t) {
-  boolean res = true;
-  // generic test
-  codeCreate();
-  cCode.addAll(aCode);
-  cCode.addAll(bCode);
-  res &= t.checkExpect(abcdef.cypher.decode(cCode), "cab");
-  // tests adding a question mark at the end
-  codeCreate();
-  cCode.addAll(aCode);
-  cCode.addAll(bCode);
-  cCode.add(true);
-  res &= t.checkExpect(abcdef.cypher.decode(cCode), "cab?");
-  // using all letters
-  codeCreate();
-  dCode.addAll(eCode);
-  dCode.addAll(cCode);
-  dCode.addAll(aCode);
-  dCode.addAll(fCode);
-  cCode.add(true);
-  res &= t.checkExpect(abcdef.cypher.decode(cCode), "decaf?");
-  return res;
-}
+  // tests the encode method
+  boolean testEncode(Tester t) {
+    boolean res = true;
+    // generic test
+    codeCreate();
+    cCode.addAll(aCode);
+    cCode.addAll(bCode);
+    res &= t.checkExpect(abcdef.encode("cab"), cCode);
+    // tests an illeal letter
+    res &= t.checkException(
+        new IllegalArgumentException("Tried to encode r but that is not part of the language."),
+        abcdef, "encode", "car");
+    // tests multiple illeal letter
+    res &= t.checkException(
+        new IllegalArgumentException("Tried to encode r but that is not part of the language."),
+        abcdef, "encode", "cars");
+
+    return res;
+  }
+
+  // tests the decode method in the Huffman class
+  boolean testHuffmanDecode(Tester t) {
+    boolean res = true;
+    // generic test
+    codeCreate();
+    cCode.addAll(aCode);
+    cCode.addAll(bCode);
+    res &= t.checkExpect(abcdef.decode(cCode), "cab");
+    // tests adding a question mark at the end
+    codeCreate();
+    cCode.addAll(aCode);
+    cCode.addAll(bCode);
+    cCode.add(true);
+    res &= t.checkExpect(abcdef.decode(cCode), "cab?");
+    // using all letters
+    codeCreate();
+    dCode.addAll(eCode);
+    dCode.addAll(cCode);
+    dCode.addAll(aCode);
+    dCode.addAll(fCode);
+    cCode.add(true);
+    res &= t.checkExpect(abcdef.decode(cCode), "decaf?");
+    return res;
+  }
+
+  //tests the decode method in the Forest class
+  boolean testForestDecode(Tester t) {
+    boolean res = true;
+    // generic test
+    codeCreate();
+    cCode.addAll(aCode);
+    cCode.addAll(bCode);
+    res &= t.checkExpect(abcdef.cypher.decode(cCode), "cab");
+    // tests adding a question mark at the end
+    codeCreate();
+    cCode.addAll(aCode);
+    cCode.addAll(bCode);
+    cCode.add(true);
+    res &= t.checkExpect(abcdef.cypher.decode(cCode), "cab?");
+    // using all letters
+    codeCreate();
+    dCode.addAll(eCode);
+    dCode.addAll(cCode);
+    dCode.addAll(aCode);
+    dCode.addAll(fCode);
+    cCode.add(true);
+    res &= t.checkExpect(abcdef.cypher.decode(cCode), "decaf?");
+    return res;
+  }
+
   
+  // 
 }
