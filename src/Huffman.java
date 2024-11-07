@@ -3,6 +3,12 @@ import java.util.Arrays;
 import tester.Tester;
 
 abstract class ABranch {
+  Integer frequency;
+  
+  public ABranch(Integer frequency) {
+    this.frequency = frequency;
+  }
+  
   public abstract void addToForest(int start, Forest forest);
 
   int getLeft(int root) {
@@ -17,30 +23,22 @@ abstract class ABranch {
     return (node - 1) / 2;
   }
   
-  public abstract int value();
-  
   public boolean isLessThan(ABranch other) {
-    return other.isGreaterThanValue(this.value());
+    return other.isGreaterThanValue(this.frequency);
   }
   
   public boolean isGreaterThanValue(int value) {
-    return this.value() > value;
+    return this.frequency > value;
   }
 }
 
 class Leaf extends ABranch {
   String letter;
-  Integer frequency;
 
   public Leaf(String letter, Integer frequency) {
+    super(frequency);
     this.letter = letter;
-    this.frequency = frequency;
   }
-  
-  public int value() {
-    return frequency;
-  }
-  
 
   public void addToForest(int start, Forest forest) {
     forest.insert(this, start);
@@ -49,22 +47,15 @@ class Leaf extends ABranch {
 
 class Forest extends ABranch {
   ArrayList<Leaf> leaves;
-  Integer total;
 
   public Forest(ABranch branch1, ABranch branch2) {
-    this.total = branch1.value() + branch2.value();
-    
+    super(branch1.frequency + branch2.frequency);
     leaves = new ArrayList<Leaf>();
     
     branch1.addToForest(1, this);
     branch2.addToForest(2, this);
   }
   
-  public int value() {
-    return total;
-
-  }
-
   public void insert(Leaf leaf, int index) {
     while (leaves.size() <= index) {
       leaves.add(null);
