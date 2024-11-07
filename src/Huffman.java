@@ -380,14 +380,20 @@ class ExamplesHuffman {
    cCode.addAll(aCode);
    cCode.addAll(bCode);
    res &= t.checkExpect(abcdef.decode(cCode), "cab");
-   
    // tests adding a question mark at the end
    codeCreate();
    cCode.addAll(aCode);
    cCode.addAll(bCode);
    cCode.add(true);
    res &= t.checkExpect(abcdef.decode(cCode), "cab?");
-   
+   // using all letters
+   codeCreate();
+   dCode.addAll(eCode);
+   dCode.addAll(cCode);
+   dCode.addAll(aCode);
+   dCode.addAll(fCode);
+   cCode.add(true);
+   res &= t.checkExpect(abcdef.decode(cCode), "decaf?");
    return res;
  }
   
