@@ -360,7 +360,17 @@ class ExamplesHuffman {
     res &= t.checkExpect(a.isGreaterThanValue(10), false);
     return res;
   }
-
+  
+  //tests letterIs method
+  boolean testLetterIs(Tester t) {
+    boolean res = true;
+    // tests a false
+    res &= t.checkExpect(a.letterIs("b"), false);
+    // tests a true
+    res &= t.checkExpect(a.letterIs("a"), true);
+    return res;
+  }
+  
   // tests the addToForest method
   boolean testAddToForest(Tester t) {
     boolean res = true;
@@ -423,8 +433,8 @@ class ExamplesHuffman {
    return res;
  }
  
- //tests the encode method
- boolean testDecode(Tester t) {
+ //tests the decode method in the Huffman class
+ boolean testHuffmanDecode(Tester t) {
    boolean res = true;
    // generic test
    codeCreate();
@@ -447,5 +457,30 @@ class ExamplesHuffman {
    res &= t.checkExpect(abcdef.decode(cCode), "decaf?");
    return res;
  }
+ 
+//tests the decode method in the Forest class
+boolean testForestDecode(Tester t) {
+  boolean res = true;
+  // generic test
+  codeCreate();
+  cCode.addAll(aCode);
+  cCode.addAll(bCode);
+  res &= t.checkExpect(abcdef.cypher.decode(cCode), "cab");
+  // tests adding a question mark at the end
+  codeCreate();
+  cCode.addAll(aCode);
+  cCode.addAll(bCode);
+  cCode.add(true);
+  res &= t.checkExpect(abcdef.cypher.decode(cCode), "cab?");
+  // using all letters
+  codeCreate();
+  dCode.addAll(eCode);
+  dCode.addAll(cCode);
+  dCode.addAll(aCode);
+  dCode.addAll(fCode);
+  cCode.add(true);
+  res &= t.checkExpect(abcdef.cypher.decode(cCode), "decaf?");
+  return res;
+}
   
 }
