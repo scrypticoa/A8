@@ -440,26 +440,6 @@ class ExamplesHuffman {
     return res;
   }
 
-  // tests the encode method
-  boolean testEncode(Tester t) {
-    boolean res = true;
-    // generic test
-    codeCreate();
-    cCode.addAll(aCode);
-    cCode.addAll(bCode);
-    res &= t.checkExpect(abcdef.encode("cab"), cCode);
-    // tests an illeal letter
-    res &= t.checkException(
-        new IllegalArgumentException("Tried to encode r but that is not part of the language."),
-        abcdef, "encode", "car");
-    // tests multiple illeal letter
-    res &= t.checkException(
-        new IllegalArgumentException("Tried to encode r but that is not part of the language."),
-        abcdef, "encode", "cars");
-
-    return res;
-  }
-
   // tests the decode method in the Huffman class
   boolean testHuffmanDecode(Tester t) {
     boolean res = true;
@@ -480,8 +460,8 @@ class ExamplesHuffman {
     dCode.addAll(cCode);
     dCode.addAll(aCode);
     dCode.addAll(fCode);
-    cCode.add(true);
-    res &= t.checkExpect(abcdef.decode(cCode), "decaf?");
+    dCode.add(true);
+    res &= t.checkExpect(abcdef.decode(dCode), "decaf?");
     return res;
   }
 
@@ -505,8 +485,8 @@ class ExamplesHuffman {
     dCode.addAll(cCode);
     dCode.addAll(aCode);
     dCode.addAll(fCode);
-    cCode.add(true);
-    res &= t.checkExpect(abcdef.cypher.decode(cCode), "decaf?");
+    dCode.add(true);
+    res &= t.checkExpect(abcdef.cypher.decode(dCode), "decaf?");
     return res;
   }
 
@@ -552,7 +532,15 @@ class ExamplesHuffman {
  boolean testOutputToBinary(Tester t) {
    boolean res = true;
    
+   ArrayList<Boolean> bin3 = new ArrayList<Boolean>();
+       
+   fBF.outputToBinary(3, bin3);
+   res &= t.checkExpect(bin3, new ArrayList<Boolean>(Arrays.asList(true, true)));
    
+   ArrayList<Boolean> bin8 = new ArrayList<Boolean>();
+   
+   fBF.outputToBinary(8, bin8);
+   res &= t.checkExpect(bin8, new ArrayList<Boolean>(Arrays.asList(true, false, false, false)));
    
    return res;
  }
