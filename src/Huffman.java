@@ -45,6 +45,10 @@ class Leaf extends ABranch {
   public void addToForest(int start, Forest forest) {
     forest.insert(this, start);
   }
+  
+  public boolean letterIs(String letter) {
+    return this.letter == letter;
+  }
 }
 
 class Forest extends ABranch {
@@ -87,6 +91,68 @@ class Forest extends ABranch {
 
     this.doAddToForest(getLeft(insertLoc), getLeft(extractLoc), forest);
     this.doAddToForest(getRight(insertLoc), getRight(extractLoc), forest);
+  }
+  
+  public void appendEncodeLetter(String letter, ArrayList<Boolean> output) {
+    ArrayList<Integer> checkLocs = new ArrayList<Integer>();
+    checkLocs.add(1);
+    checkLocs.add(2);
+    
+    int firstLoc = 0;
+    while (checkLocs.get(checkLocs.size() - 1) <= leaves.size()) {
+      firstLoc = getLeft(firstLoc);
+      for (int i = checkLocs.size() - 1; i > -1; i--) {
+        int loc = checkLocs.get(i);
+        Leaf leaf = leaves.get(loc);
+        if (leaf == null) continue;
+        
+        if (!leaf.letterIs(letter)) {
+          checkLocs.remove(i);
+          continue;
+        }
+        
+        int locDiff = loc - firstLoc;
+        
+        outputToBinary(locDiff, output);
+        
+        return;
+      }
+      
+      int checkLocsSize = checkLocs.size();
+      for (int i = 0; i < checkLocsSize; i++) {
+        int loc = checkLocs.get(i);
+        checkLocs.set(i, getLeft(loc));
+        checkLocs.add(getRight(loc));
+      }
+    }
+    
+    throw new IllegalArgumentException("Tried to encode " + letter + " but that is not part of the language.");
+  }
+  
+  public void outputToBinary(int base10, ArrayList<Boolean> output) {
+    if (base10 < 1) return;
+    boolean digit = base10 % 2 == 1;
+    outputToBinary(base10 / 2, output);
+    output.add(digit);
+  }
+  
+  public String decode(ArrayList<Boolean> sequence) {
+    String res = "";
+    int readHead = 0;
+    
+    for (int i = 0; i < sequence.size(); i++) {
+      readHead = sequence.get(i) ? getRight(readHead) : getLeft(readHead);
+      Leaf leaf = this.leaves.get(readHead);
+      
+      if (leaf == null) continue;
+      
+      res += leaf.letter;
+      readHead = 0;
+    }
+    
+    if (readHead != 0) res += "?";
+    
+    return res;
   }
 }
 
@@ -153,15 +219,19 @@ class Huffman {
   }
   
   public ArrayList<Boolean> encode(String toEncode) {
-    ArrayList<Boolean> encoded;
+    ArrayList<Boolean> encoded = new ArrayList<Boolean>();
     for (int i = 0; i < toEncode.length(); i++) {
-      encoded.add(null);
+      appendEncodeLetter(toEncode.substring(i, i+1), encoded);
     }
-    
+    return encoded;
   }
   
   public void appendEncodeLetter(String letter, ArrayList<Boolean> output) {
-    
+    cypher.appendEncodeLetter(letter, output);
+  }
+  
+  public String decode(ArrayList<Boolean> sequence) {
+    return cypher.decode(sequence);
   }
 }
 
