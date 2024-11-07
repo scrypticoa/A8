@@ -79,7 +79,9 @@ class Forest extends ABranch {
 
   // adds this ABranch to a Forest at a position in the Forest
   public void addToForest(int start, Forest forest) {
-    doAddToForest(start, 0, forest);
+    forest.insert(null, start);
+    doAddToForest(getLeft(start), 1, forest);
+    doAddToForest(getRight(start), 2, forest);
   }
 
   public void doAddToForest(int insertLoc, int extractLoc, Forest forest) {
@@ -245,6 +247,23 @@ class Huffman {
 }
 
 class ExamplesHuffman {
+  
+  boolean subForestsEqual(Forest a, int aHead, Forest b, int bHead) {
+    Leaf aLeaf = a.leaves.get(aHead);
+    Leaf bLeaf = b.leaves.get(bHead);
+    
+    if (aLeaf != null && bLeaf != null) {
+      return aLeaf.letterIs(bLeaf.letter);
+    }
+    
+    if ((aLeaf == null) != (bLeaf == null)) {
+      return false;
+    }
+    
+    if (!subForestsEqual(a, a.getLeft(aHead), b, b.getLeft(bHead))) return false;
+    return subForestsEqual(a, a.getRight(aHead), b, b.getRight(bHead));
+  }
+  
   Leaf a = new Leaf("a", 8);
   Leaf b = new Leaf("b", 2);
   Leaf c = new Leaf("c", 3);
@@ -313,14 +332,44 @@ class ExamplesHuffman {
   //tests the addToForest method
   boolean testAddToForest(Tester t) {
     boolean res = true;
+    
+    // leaf test
+    
+    Forest fCDCopy = new Forest(c, d);
+    
+    a.addToForest(2, fCDCopy);
+    
+    res &= t.checkExpect(fCDCopy.leaves.get(2), a);
+    
+    // forest test
+    
+    fBF.addToForest(1, fCDCopy);
+    
+    res &= t.checkExpect(subForestsEqual(fCDCopy, 1, fBF, 0), true);
+    
     return res;
   }
   
   //tests the insert method
   boolean testInsert(Tester t) {
     boolean res = true;
+    
+    // replace case
+    
+    Forest fCDCopy = new Forest(c, d);
+    
+    fCDCopy.insert(a, 1);
+    
+    res &= t.checkExpect(fCDCopy.leaves.get(1), a);
+    
+    // add blank nulls case
+    
+    fCDCopy.insert(f, 5);
+    
+    res &= t.checkExpect(fCDCopy.leaves.get(3), null);
+    res &= t.checkExpect(fCDCopy.leaves.get(4), null);
+    res &= t.checkExpect(fCDCopy.leaves.get(5), f);
+    
     return res;
   }
-  
-
 }
