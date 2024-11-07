@@ -2,13 +2,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import tester.Tester;
 
+
 abstract class ABranch {
   Integer frequency;
-  
+
   public ABranch(Integer frequency) {
     this.frequency = frequency;
   }
-  
+
   public abstract void addToForest(int start, Forest forest);
 
   int getLeft(int root) {
@@ -19,14 +20,10 @@ abstract class ABranch {
     return 2 + (2 * root);
   }
 
-  int getChild(int node) {
-    return (node - 1) / 2;
-  }
-  
   public boolean isLessThan(ABranch other) {
     return other.isGreaterThanValue(this.frequency);
   }
-  
+
   public boolean isGreaterThanValue(int value) {
     return this.frequency > value;
   }
@@ -51,11 +48,11 @@ class Forest extends ABranch {
   public Forest(ABranch branch1, ABranch branch2) {
     super(branch1.frequency + branch2.frequency);
     leaves = new ArrayList<Leaf>();
-    
+
     branch1.addToForest(1, this);
     branch2.addToForest(2, this);
   }
-  
+
   public void insert(Leaf leaf, int index) {
     while (leaves.size() <= index) {
       leaves.add(null);
@@ -84,9 +81,8 @@ class Forest extends ABranch {
 class Huffman {
   ArrayList<String> letters;
   ArrayList<Integer> frequencies;
-  
+
   Forest cypher;
-  
 
   public Huffman(ArrayList<String> letters, ArrayList<Integer> frequencies) {
 
@@ -100,25 +96,26 @@ class Huffman {
 
     this.letters = letters;
     this.frequencies = frequencies;
-    
+
     ArrayList<ABranch> branches = generateBranchArray(letters, frequencies);
-    
+
     this.cypher = mergeAll(branches);
   }
-  
-  public ArrayList<ABranch> generateBranchArray(ArrayList<String> letters, ArrayList<Integer> frequencies) {
-    
+
+  public ArrayList<ABranch> generateBranchArray(ArrayList<String> letters,
+      ArrayList<Integer> frequencies) {
+
     ArrayList<ABranch> result = new ArrayList<ABranch>();
-    
+
     for (int i = letters.size() - 1; i > -1; i--) {
       Leaf leaf = new Leaf(letters.get(i), frequencies.get(i));
-      
+
       sortInto(result, leaf);
     }
-    
+
     return result;
   }
-  
+
   public void sortInto(ArrayList<ABranch> branches, ABranch newLeaf) {
     for (int i = 0; i < branches.size(); i++) {
       if (!branches.get(i).isLessThan(newLeaf)) {
@@ -128,31 +125,31 @@ class Huffman {
     }
     branches.add(newLeaf);
   }
-  
+
   public Forest mergeAll(ArrayList<ABranch> branches) {
     while (branches.size() > 2) {
       ABranch small0 = branches.remove(0);
       ABranch small1 = branches.remove(0);
-      
+
       sortInto(branches, new Forest(small0, small1));
     }
-    
+
     ABranch small0 = branches.remove(0);
     ABranch small1 = branches.remove(0);
-    
+
     return new Forest(small0, small1);
   }
-  
+
   public ArrayList<Boolean> encode(String toEncode) {
     ArrayList<Boolean> encoded;
     for (int i = 0; i < toEncode.length(); i++) {
       encoded.add(null);
     }
-    
+
   }
-  
+
   public void appendEncodeLetter(String letter, ArrayList<Boolean> output) {
-    
+
   }
 }
 
@@ -194,6 +191,45 @@ class ExamplesHuffman {
     return res;
   }
 
+  // tests the isLessThan method
+  boolean testIsLessThan(Tester t) {
+    boolean res = true;
+    // letter to branch
+    res &= t.checkExpect(a.isLessThan(fBF), false);
+    // branch to letter
+    res &= t.checkExpect(fBF.isLessThan(a), true);
+    // branch to branch
+    res &= t.checkExpect(fCD.isLessThan(fBF), false);
+    // letter to letter
+    res &= t.checkExpect(a.isLessThan(e), true);
+    // same value
+    res &= t.checkExpect(a.isLessThan(a), false);
+    return res;
+  }
 
+  // tests the isGreaterThanValue method
+  boolean testIsGreaterThanValue(Tester t) {
+    boolean res = true;
+    // same val
+    res &= t.checkExpect(a.isGreaterThanValue(8), false);
+    // greater than
+    res &= t.checkExpect(a.isGreaterThanValue(1), true);
+    // less than
+    res &= t.checkExpect(a.isGreaterThanValue(10), false);
+    return res;
+  }
+
+  //tests the addToForest method
+  boolean testAddToForest(Tester t) {
+    boolean res = true;
+    return res;
+  }
+  
+  //tests the insert method
+  boolean testInsert(Tester t) {
+    boolean res = true;
+    return res;
+  }
+  
 
 }
