@@ -35,7 +35,7 @@ abstract class ABranch {
   }
 }
 
-// a letter with its frequencs
+// a letter with its frequencies
 class Leaf extends ABranch {
   String letter;
 
@@ -174,8 +174,9 @@ class Forest extends ABranch {
       readHead = sequence.get(i) ? getRight(readHead) : getLeft(readHead);
       Leaf leaf = this.leaves.get(readHead);
 
-      if (leaf == null)
+      if (leaf == null) {
         continue;
+      }
 
       res += leaf.letter;
       readHead = 0;
