@@ -96,23 +96,23 @@ class Forest extends ABranch {
   }
 
   public void appendEncodeLetter(String letter, ArrayList<Boolean> output) {
-    //System.out.println(this.leaves);
-    //System.out.println(letter);
-    
-    /*for (int i = 0; i < leaves.size(); i++) {
-      if (leaves.get(i) != null) {
-        System.out.print(i + " " + leaves.get(i).letter + " ");
-      }
-    }*/
-    
+    // System.out.println(this.leaves);
+    // System.out.println(letter);
+
+    /*
+     * for (int i = 0; i < leaves.size(); i++) { if (leaves.get(i) != null) {
+     * System.out.print(i + " " + leaves.get(i).letter + " "); } }
+     */
+
     ArrayList<Integer> checkLocs = new ArrayList<Integer>();
     checkLocs.add(1);
     checkLocs.add(2);
-    
+
     int firstLoc = 0;
     while (checkLocs.size() > 0) {
-      if (!(checkLocs.get(checkLocs.size() - 1) <= leaves.size())) break;
-      //System.out.println(checkLocs);
+      if (!(checkLocs.get(checkLocs.size() - 1) <= leaves.size()))
+        break;
+      // System.out.println(checkLocs);
       firstLoc = getLeft(firstLoc);
       for (int i = checkLocs.size() - 1; i > -1; i--) {
         int loc = checkLocs.get(i);
@@ -125,7 +125,7 @@ class Forest extends ABranch {
           checkLocs.remove(i);
           continue;
         }
-        
+
         int locDiff = loc - firstLoc;
 
         outputToBinary(locDiff, output);
@@ -310,12 +310,12 @@ class ExamplesHuffman {
   ArrayList<Boolean> fCode;
 
   void codeCreate() {
-  aCode = new ArrayList<Boolean>(Arrays.asList(true, false));
-  bCode = new ArrayList<Boolean>(Arrays.asList(true, true, true, true, false));
-  cCode = new ArrayList<Boolean>(Arrays.asList(true, true, true, false));
-  dCode = new ArrayList<Boolean>(Arrays.asList(true, true, false));
-  eCode = new ArrayList<Boolean>(Arrays.asList(false));
-  fCode = new ArrayList<Boolean>(Arrays.asList(true, true, true, true, true));
+    aCode = new ArrayList<Boolean>(Arrays.asList(true, false));
+    bCode = new ArrayList<Boolean>(Arrays.asList(true, true, true, true, false));
+    cCode = new ArrayList<Boolean>(Arrays.asList(true, true, true, false));
+    dCode = new ArrayList<Boolean>(Arrays.asList(true, true, false));
+    eCode = new ArrayList<Boolean>(Arrays.asList(false));
+    fCode = new ArrayList<Boolean>(Arrays.asList(true, true, true, true, true));
   }
 
   // tests the getLeft method
@@ -400,20 +400,20 @@ class ExamplesHuffman {
 
     return res;
   }
-  
+
   boolean testDoAddToForest(Tester t) {
     boolean res = true;
-    
+
     Forest fCDCopy = new Forest(c, d);
-    
+
     // generic with forest
-    
+
     fCDCopy.insert(null, 1);
     fBF.doAddToForest(fBF.getLeft(1), 1, fCDCopy);
     fBF.doAddToForest(fBF.getRight(1), 2, fCDCopy);
-    
+
     res &= t.checkExpect(subForestsEqual(fCDCopy, 1, fBF, 0), true);
-    
+
     return res;
   }
 
@@ -440,6 +440,26 @@ class ExamplesHuffman {
     return res;
   }
 
+  // tests the encode method
+  boolean testEncode(Tester t) {
+    boolean res = true;
+    // generic test
+    codeCreate();
+    cCode.addAll(aCode);
+    cCode.addAll(bCode);
+    res &= t.checkExpect(abcdef.encode("cab"), cCode);
+    // tests an illeal letter
+    res &= t.checkException(
+        new IllegalArgumentException("Tried to encode r but that is not part of the language."),
+        abcdef, "encode", "car");
+    // tests multiple illeal letter
+    res &= t.checkException(
+        new IllegalArgumentException("Tried to encode r but that is not part of the language."),
+        abcdef, "encode", "cars");
+
+    return res;
+  }
+
   // tests the decode method in the Huffman class
   boolean testHuffmanDecode(Tester t) {
     boolean res = true;
@@ -460,12 +480,12 @@ class ExamplesHuffman {
     dCode.addAll(cCode);
     dCode.addAll(aCode);
     dCode.addAll(fCode);
-    dCode.add(true);
-    res &= t.checkExpect(abcdef.decode(dCode), "decaf?");
+    cCode.add(true);
+    res &= t.checkExpect(abcdef.decode(cCode), "decaf?");
     return res;
   }
 
-  //tests the decode method in the Forest class
+  // tests the decode method in the Forest class
   boolean testForestDecode(Tester t) {
     boolean res = true;
     // generic test
@@ -485,84 +505,67 @@ class ExamplesHuffman {
     dCode.addAll(cCode);
     dCode.addAll(aCode);
     dCode.addAll(fCode);
-    dCode.add(true);
-    res &= t.checkExpect(abcdef.cypher.decode(dCode), "decaf?");
+    cCode.add(true);
+    res &= t.checkExpect(abcdef.cypher.decode(cCode), "decaf?");
     return res;
   }
 
- //tests the encode method
- boolean testEncode(Tester t) {
-   boolean res = true;
-   // generic test
-   codeCreate();
-   cCode.addAll(aCode);
-   cCode.addAll(bCode);
-   res &= t.checkExpect(abcdef.encode("cab"), cCode);
-   // tests an illegal letter
-   res &= t.checkException(new IllegalArgumentException(
-       "Tried to encode r but that is not part of the language."), abcdef, "encode", "car");
-   // tests multiple illegal letter
-   res &= t.checkException(new IllegalArgumentException(
-       "Tried to encode r but that is not part of the language."), abcdef, "encode", "cars");
-   
-   return res;
- }
- 
- boolean testAppendEncodeLetter(Tester t) {
-   boolean res = true;
-   
-   // generic case
-   
-   ArrayList<Boolean> bools = new ArrayList<Boolean>();
-   abcdef.cypher.appendEncodeLetter("a", bools);
-   
-   codeCreate();
-   
-   res &= t.checkExpect(bools, aCode);
-   
-   // error case
-   
-   t.checkException(
-       new IllegalArgumentException("Tried to encode g but that is not part of the language."),
-       abcdef, "appendEncodeLetter", "g", bools);
-   
-   return res;
- }
- 
- boolean testOutputToBinary(Tester t) {
-   boolean res = true;
-   
-   ArrayList<Boolean> bin3 = new ArrayList<Boolean>();
-       
-   fBF.outputToBinary(3, bin3);
-   res &= t.checkExpect(bin3, new ArrayList<Boolean>(Arrays.asList(true, true)));
-   
-   ArrayList<Boolean> bin8 = new ArrayList<Boolean>();
-   
-   fBF.outputToBinary(8, bin8);
-   res &= t.checkExpect(bin8, new ArrayList<Boolean>(Arrays.asList(true, false, false, false)));
-   
-   return res;
- }
- 
- //tests the encode method
- boolean testDecode(Tester t) {
-   boolean res = true;
-   // generic test
-   codeCreate();
-   cCode.addAll(aCode);
-   cCode.addAll(bCode);
-   res &= t.checkExpect(abcdef.decode(cCode), "cab");
-   
-   // tests adding a question mark at the end
-   codeCreate();
-   cCode.addAll(aCode);
-   cCode.addAll(bCode);
-   cCode.add(true);
-   res &= t.checkExpect(abcdef.decode(cCode), "cab?");
-   
-   return res;
- }
-  
-  // 
+  boolean testAppendEncodeLetter(Tester t) {
+    boolean res = true;
+
+    // generic case
+
+    ArrayList<Boolean> bools = new ArrayList<Boolean>();
+    abcdef.cypher.appendEncodeLetter("a", bools);
+
+    codeCreate();
+
+    res &= t.checkExpect(bools, aCode);
+
+    // error case
+
+    t.checkException(
+        new IllegalArgumentException("Tried to encode g but that is not part of the language."),
+        abcdef, "appendEncodeLetter", "g", bools);
+
+    return res;
+  }
+
+  boolean testOutputToBinary(Tester t) {
+    boolean res = true;
+
+    return res;
+  }
+
+  // tests the sortInto method
+  boolean testSortInto(Tester t) {
+    boolean res = true;
+
+    // tests adding to the end
+    ArrayList<ABranch> sorted = new ArrayList<ABranch>(Arrays.asList(e, a, f));
+    abcdef.sortInto(sorted, b);
+    ArrayList<ABranch> sortedNew = new ArrayList<ABranch>(Arrays.asList(e, a, f, b));
+    res &= t.checkExpect(sorted, sortedNew);
+
+    // tests adding in the middle
+    sorted = new ArrayList<ABranch>(Arrays.asList(e, a, b));
+    abcdef.sortInto(sorted, f);
+    sortedNew = new ArrayList<ABranch>(Arrays.asList(e, a, f, b));
+    res &= t.checkExpect(sorted, sortedNew);
+
+    // tests adding to the front
+    sorted = new ArrayList<ABranch>(Arrays.asList(a, f, b));
+    abcdef.sortInto(sorted, e);
+    sortedNew = new ArrayList<ABranch>(Arrays.asList(e, a, f, b));
+    res &= t.checkExpect(sorted, sortedNew);
+
+    return res;
+  }
+
+//tests the generateBranchArray method
+  boolean testGenerateBranchArray(Tester t) {
+    ArrayList<ABranch> result = new ArrayList<ABranch>(Arrays.asList(b, f, c, d, a, e));
+    return t.checkExpect(abcdef.generateBranchArray(aTof, aTofFre), result);
+  }
+
 }
