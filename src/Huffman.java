@@ -68,6 +68,8 @@ class Forest extends ABranch {
     branch2.addToForest(2, this);
   }
 
+  // inserts a given leaf at an index of leaves
+  // adds nulls for blank indexes if needed
   public void insert(Leaf leaf, int index) {
     while (leaves.size() <= index) {
       leaves.add(null);
@@ -83,6 +85,8 @@ class Forest extends ABranch {
     doAddToForest(getRight(start), 2, forest);
   }
 
+  // helper for add forest which branches out, ending recursion on a given
+  // branch when it finds its leaf and adds it to forest
   public void doAddToForest(int insertLoc, int extractLoc, Forest forest) {
     Leaf leaf = this.leaves.get(extractLoc);
 
@@ -95,6 +99,8 @@ class Forest extends ABranch {
     this.doAddToForest(getRight(insertLoc), getRight(extractLoc), forest);
   }
 
+  // appends the binary sequence to output which represents letter in this
+  // forest. If letter does not exist in this forest throws an exception
   public void appendEncodeLetter(String letter, ArrayList<Boolean> output) {
     // System.out.println(this.leaves);
     // System.out.println(letter);
@@ -145,6 +151,8 @@ class Forest extends ABranch {
         "Tried to encode " + letter + " but that is not part of the language.");
   }
 
+  // converts base10 to binary represented by boolean values and appends
+  // those bools to output
   public void outputToBinary(int base10, ArrayList<Boolean> output) {
     if (base10 < 1)
       return;
@@ -153,6 +161,8 @@ class Forest extends ABranch {
     output.add(digit);
   }
 
+  // given a binary sequence, returns the string they represent in this forest
+  // if the final character being deciphered is undefined in this forest, adds ? to the output string
   public String decode(ArrayList<Boolean> sequence) {
     String res = "";
     int readHead = 0;
@@ -253,10 +263,13 @@ class Huffman {
 
   }
 
+  // this huffman's computed cypher appends the encoded binary representation
+  // of letter to output
   public void appendEncodeLetter(String letter, ArrayList<Boolean> output) {
     cypher.appendEncodeLetter(letter, output);
   }
 
+  // decodes a given binary sequence according to the computed cypher
   public String decode(ArrayList<Boolean> sequence) {
     return cypher.decode(sequence);
   }
@@ -486,8 +499,8 @@ class ExamplesHuffman {
     dCode.addAll(cCode);
     dCode.addAll(aCode);
     dCode.addAll(fCode);
-    cCode.add(true);
-    res &= t.checkExpect(abcdef.decode(cCode), "decaf?");
+    dCode.add(true);
+    res &= t.checkExpect(abcdef.decode(dCode), "decaf?");
     return res;
   }
 
@@ -511,28 +524,10 @@ class ExamplesHuffman {
     dCode.addAll(cCode);
     dCode.addAll(aCode);
     dCode.addAll(fCode);
-    cCode.add(true);
-    res &= t.checkExpect(abcdef.cypher.decode(cCode), "decaf?");
+    dCode.add(true);
+    res &= t.checkExpect(abcdef.cypher.decode(dCode), "decaf?");
     return res;
   }
-
- //tests the encode method
- boolean testEncode(Tester t) {
-   boolean res = true;
-   // generic test
-   codeCreate();
-   cCode.addAll(aCode);
-   cCode.addAll(bCode);
-   res &= t.checkExpect(abcdef.encode("cab"), cCode);
-   // tests an illegal letter
-   res &= t.checkException(new IllegalArgumentException(
-       "Tried to encode r but that is not part of the language."), abcdef, "encode", "car");
-   // tests multiple illegal letter
-   res &= t.checkException(new IllegalArgumentException(
-       "Tried to encode r but that is not part of the language."), abcdef, "encode", "cars");
-   
-   return res;
- }
  
  boolean testAppendEncodeLetter(Tester t) {
    boolean res = true;
@@ -618,22 +613,22 @@ class ExamplesHuffman {
   boolean testSortInto(Tester t) {
     boolean res = true;
 
-    // tests adding to the end
-    ArrayList<ABranch> sorted = new ArrayList<ABranch>(Arrays.asList(e, a, f));
+    // tests adding to the front
+    ArrayList<ABranch> sorted = new ArrayList<ABranch>(Arrays.asList(f, a, e));
     abcdef.sortInto(sorted, b);
-    ArrayList<ABranch> sortedNew = new ArrayList<ABranch>(Arrays.asList(e, a, f, b));
+    ArrayList<ABranch> sortedNew = new ArrayList<ABranch>(Arrays.asList(b, f, a, e));
     res &= t.checkExpect(sorted, sortedNew);
 
     // tests adding in the middle
-    sorted = new ArrayList<ABranch>(Arrays.asList(e, a, b));
-    abcdef.sortInto(sorted, f);
-    sortedNew = new ArrayList<ABranch>(Arrays.asList(e, a, f, b));
+    sorted = new ArrayList<ABranch>(Arrays.asList(b, f, e));
+    abcdef.sortInto(sorted, a);
+    sortedNew = new ArrayList<ABranch>(Arrays.asList(b, f, a, e));
     res &= t.checkExpect(sorted, sortedNew);
 
-    // tests adding to the front
-    sorted = new ArrayList<ABranch>(Arrays.asList(a, f, b));
+    // tests adding to the end
+    sorted = new ArrayList<ABranch>(Arrays.asList(b, f, a));
     abcdef.sortInto(sorted, e);
-    sortedNew = new ArrayList<ABranch>(Arrays.asList(e, a, f, b));
+    sortedNew = new ArrayList<ABranch>(Arrays.asList(b, f, a, e));
     res &= t.checkExpect(sorted, sortedNew);
 
     return res;
