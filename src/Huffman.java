@@ -47,7 +47,7 @@ class Leaf extends ABranch {
 
   // adds this ABranch to a Forest at a position in the Forest
   public void addToForest(int start, Forest forest) {
-    forest.insert(this, start);
+    forest.insert(new Leaf(this.letter, this.frequency), start);
   }
 
   public boolean letterIs(String letter) {
@@ -299,6 +299,12 @@ class ExamplesHuffman {
   ArrayList<Integer> aTofFre = new ArrayList<Integer>(Arrays.asList(8, 2, 3, 4, 13, 2));
 
   Huffman abcdef = new Huffman(aTof, aTofFre);
+  
+  Forest fCBF = new Forest(c, fBF);
+  Forest fDCBF = new Forest(d, fCBF);
+  Forest fADCBF = new Forest(a, fDCBF);
+  Forest fEADCBF = new Forest(e, fADCBF);
+  
   /*
    * a = 10 b = 1100 c = 1110 d = 1111 e = 0 f = 1101
    */
@@ -563,6 +569,28 @@ class ExamplesHuffman {
    
    return res;
  }
-  
-  // 
+ 
+ boolean testMergeAll(Tester t) {
+   boolean res = true;
+   
+   // generic merge all
+   
+   res &= t.checkExpect(
+       abcdef.mergeAll(new ArrayList<ABranch>(Arrays.asList(b, f, c, d, a, e))),
+       fEADCBF);
+   
+   // intermediate merge all
+   
+   res &= t.checkExpect(
+       abcdef.mergeAll(new ArrayList<ABranch>(Arrays.asList(c, fBF, d, a, e))),
+       fEADCBF);
+   
+   // final merge all
+
+   res &= t.checkExpect(
+       abcdef.mergeAll(new ArrayList<ABranch>(Arrays.asList(e, fADCBF))),
+       new Forest(e, fADCBF));
+   
+   return res;
+ }
 }
