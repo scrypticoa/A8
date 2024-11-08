@@ -116,8 +116,9 @@ class Forest extends ABranch {
 
     int firstLoc = 0;
     while (checkLocs.size() > 0) {
-      if (!(checkLocs.get(checkLocs.size() - 1) <= leaves.size()))
+      if (checkLocs.get(checkLocs.size() - 1) > leaves.size()) {
         break;
+      }
       // System.out.println(checkLocs);
       firstLoc = getLeft(firstLoc);
       for (int i = checkLocs.size() - 1; i > -1; i--) {
@@ -154,15 +155,17 @@ class Forest extends ABranch {
   // converts base10 to binary represented by boolean values and appends
   // those bools to output
   public void outputToBinary(int base10, ArrayList<Boolean> output) {
-    if (base10 < 1)
+    if (base10 < 1) {
       return;
+    }
     boolean digit = base10 % 2 == 1;
     outputToBinary(base10 / 2, output);
     output.add(digit);
   }
 
   // given a binary sequence, returns the string they represent in this forest
-  // if the final character being deciphered is undefined in this forest, adds ? to the output string
+  // if the final character being deciphered is undefined in this forest,
+  // adds ? to the output string
   public String decode(ArrayList<Boolean> sequence) {
     String res = "";
     int readHead = 0;
@@ -178,8 +181,9 @@ class Forest extends ABranch {
       readHead = 0;
     }
 
-    if (readHead != 0)
+    if (readHead != 0) {
       res += "?";
+    }
 
     return res;
   }
@@ -217,7 +221,7 @@ class Huffman {
 
     ArrayList<ABranch> result = new ArrayList<ABranch>();
 
-    for (int i = letters.size() - 1; i > -1; i--) {
+    for (int i = 0; i < letters.size(); i++) {
       Leaf leaf = new Leaf(letters.get(i), frequencies.get(i));
 
       sortInto(result, leaf);
@@ -229,7 +233,7 @@ class Huffman {
   // puts a ABranch into a sorted list of sorted ABranches
   public void sortInto(ArrayList<ABranch> branches, ABranch newLeaf) {
     for (int i = 0; i < branches.size(); i++) {
-      if (!branches.get(i).isLessThan(newLeaf)) {
+      if (newLeaf.isLessThan(branches.get(i))) {
         branches.add(i, newLeaf);
         return;
       }
@@ -290,8 +294,9 @@ class ExamplesHuffman {
       return false;
     }
 
-    if (!subForestsEqual(a, a.getLeft(aHead), b, b.getLeft(bHead)))
+    if (!subForestsEqual(a, a.getLeft(aHead), b, b.getLeft(bHead))) {
       return false;
+    }
     return subForestsEqual(a, a.getRight(aHead), b, b.getRight(bHead));
   }
 
@@ -302,9 +307,9 @@ class ExamplesHuffman {
   Leaf e = new Leaf("e", 13);
   Leaf f = new Leaf("f", 2);
 
-  Forest fBF = new Forest(b, f);// 4
+  Forest f1 = new Forest(b, f);// 4
   Forest fCD = new Forest(c, d);// 7
-  Forest fBFCD = new Forest(fBF, fCD);// 11
+  Forest fBFCD = new Forest(f1, fCD);// 11
   Forest fABFCD = new Forest(a, fBFCD);// 19
   Forest fABCDEF = new Forest(e, fABFCD);// 32
 
@@ -313,10 +318,10 @@ class ExamplesHuffman {
 
   Huffman abcdef = new Huffman(aTof, aTofFre);
   
-  Forest fCBF = new Forest(c, fBF);
-  Forest fDCBF = new Forest(d, fCBF);
-  Forest fADCBF = new Forest(a, fDCBF);
-  Forest fEADCBF = new Forest(e, fADCBF);
+  Forest f2 = new Forest(c, d);
+  Forest f3 = new Forest(f1, f2);
+  Forest f4 = new Forest(a, f3);
+  Forest f5 = new Forest(e, f4);
   
   /*
    * a = 10 b = 1100 c = 1110 d = 1111 e = 0 f = 1101
@@ -330,20 +335,20 @@ class ExamplesHuffman {
 
   void codeCreate() {
     aCode = new ArrayList<Boolean>(Arrays.asList(true, false));
-    bCode = new ArrayList<Boolean>(Arrays.asList(true, true, true, true, false));
+    bCode = new ArrayList<Boolean>(Arrays.asList(true, true, false, false));
     cCode = new ArrayList<Boolean>(Arrays.asList(true, true, true, false));
-    dCode = new ArrayList<Boolean>(Arrays.asList(true, true, false));
+    dCode = new ArrayList<Boolean>(Arrays.asList(true, true, true, true));
     eCode = new ArrayList<Boolean>(Arrays.asList(false));
-    fCode = new ArrayList<Boolean>(Arrays.asList(true, true, true, true, true));
+    fCode = new ArrayList<Boolean>(Arrays.asList(true, true, false, true));
   }
 
   // tests the getLeft method
   boolean testGetLeft(Tester t) {
     boolean res = true;
     // tests 0
-    res &= t.checkExpect(fBF.getLeft(0), 1);
+    res &= t.checkExpect(f1.getLeft(0), 1);
     // tests 1
-    res &= t.checkExpect(fBF.getLeft(1), 3);
+    res &= t.checkExpect(f1.getLeft(1), 3);
     // tests 2
     res &= t.checkExpect(a.getLeft(2), 5);
     return res;
@@ -353,9 +358,9 @@ class ExamplesHuffman {
   boolean testGetRight(Tester t) {
     boolean res = true;
     // tests 0
-    res &= t.checkExpect(fBF.getRight(0), 2);
+    res &= t.checkExpect(f1.getRight(0), 2);
     // tests 1
-    res &= t.checkExpect(fBF.getRight(1), 4);
+    res &= t.checkExpect(f1.getRight(1), 4);
     // tests 2
     res &= t.checkExpect(a.getRight(2), 6);
     return res;
@@ -365,11 +370,11 @@ class ExamplesHuffman {
   boolean testIsLessThan(Tester t) {
     boolean res = true;
     // letter to branch
-    res &= t.checkExpect(a.isLessThan(fBF), false);
+    res &= t.checkExpect(a.isLessThan(f1), false);
     // branch to letter
-    res &= t.checkExpect(fBF.isLessThan(a), true);
+    res &= t.checkExpect(f1.isLessThan(a), true);
     // branch to branch
-    res &= t.checkExpect(fCD.isLessThan(fBF), false);
+    res &= t.checkExpect(fCD.isLessThan(f1), false);
     // letter to letter
     res &= t.checkExpect(a.isLessThan(e), true);
     // same value
@@ -413,9 +418,9 @@ class ExamplesHuffman {
 
     // forest test
 
-    fBF.addToForest(1, fCDCopy);
+    f1.addToForest(1, fCDCopy);
 
-    res &= t.checkExpect(subForestsEqual(fCDCopy, 1, fBF, 0), true);
+    res &= t.checkExpect(subForestsEqual(fCDCopy, 1, f1, 0), true);
 
     return res;
   }
@@ -428,10 +433,10 @@ class ExamplesHuffman {
     // generic with forest
 
     fCDCopy.insert(null, 1);
-    fBF.doAddToForest(fBF.getLeft(1), 1, fCDCopy);
-    fBF.doAddToForest(fBF.getRight(1), 2, fCDCopy);
+    f1.doAddToForest(f1.getLeft(1), 1, fCDCopy);
+    f1.doAddToForest(f1.getRight(1), 2, fCDCopy);
 
-    res &= t.checkExpect(subForestsEqual(fCDCopy, 1, fBF, 0), true);
+    res &= t.checkExpect(subForestsEqual(fCDCopy, 1, f1, 0), true);
 
     return res;
   }
@@ -529,94 +534,94 @@ class ExamplesHuffman {
     return res;
   }
  
- boolean testAppendEncodeLetter(Tester t) {
-   boolean res = true;
-   
-   // generic case
-   
-   ArrayList<Boolean> bools = new ArrayList<Boolean>();
-   abcdef.cypher.appendEncodeLetter("a", bools);
-   
-   codeCreate();
-   
-   res &= t.checkExpect(bools, aCode);
-   
-   // error case
-   
-   t.checkException(
-       new IllegalArgumentException("Tried to encode g but that is not part of the language."),
-       abcdef, "appendEncodeLetter", "g", bools);
-   
-   return res;
- }
+  boolean testAppendEncodeLetter(Tester t) {
+    boolean res = true;
+    
+    // generic case
+    
+    ArrayList<Boolean> bools = new ArrayList<Boolean>();
+    abcdef.cypher.appendEncodeLetter("a", bools);
+    
+    codeCreate();
+    
+    res &= t.checkExpect(bools, aCode);
+    
+    // error case
+    
+    t.checkException(
+        new IllegalArgumentException("Tried to encode g but that is not part of the language."),
+        abcdef, "appendEncodeLetter", "g", bools);
+    
+    return res;
+  }
  
- boolean testOutputToBinary(Tester t) {
-   boolean res = true;
-   
-   ArrayList<Boolean> bin3 = new ArrayList<Boolean>();
-       
-   fBF.outputToBinary(3, bin3);
-   res &= t.checkExpect(bin3, new ArrayList<Boolean>(Arrays.asList(true, true)));
-   
-   ArrayList<Boolean> bin8 = new ArrayList<Boolean>();
-   
-   fBF.outputToBinary(8, bin8);
-   res &= t.checkExpect(bin8, new ArrayList<Boolean>(Arrays.asList(true, false, false, false)));
-   
-   return res;
- }
+  boolean testOutputToBinary(Tester t) {
+    boolean res = true;
+    
+    ArrayList<Boolean> bin3 = new ArrayList<Boolean>();
+        
+    f1.outputToBinary(3, bin3);
+    res &= t.checkExpect(bin3, new ArrayList<Boolean>(Arrays.asList(true, true)));
+    
+    ArrayList<Boolean> bin8 = new ArrayList<Boolean>();
+    
+    f1.outputToBinary(8, bin8);
+    res &= t.checkExpect(bin8, new ArrayList<Boolean>(Arrays.asList(true, false, false, false)));
+    
+    return res;
+  }
  
- //tests the encode method
- boolean testDecode(Tester t) {
-   boolean res = true;
-   // generic test
-   codeCreate();
-   cCode.addAll(aCode);
-   cCode.addAll(bCode);
-   res &= t.checkExpect(abcdef.decode(cCode), "cab");
-   
-   // tests adding a question mark at the end
-   codeCreate();
-   cCode.addAll(aCode);
-   cCode.addAll(bCode);
-   cCode.add(true);
-   res &= t.checkExpect(abcdef.decode(cCode), "cab?");
-   
-   return res;
- }
+  //tests the encode method
+  boolean testDecode(Tester t) {
+    boolean res = true;
+    // generic test
+    codeCreate();
+    cCode.addAll(aCode);
+    cCode.addAll(bCode);
+    res &= t.checkExpect(abcdef.decode(cCode), "cab");
+    
+    // tests adding a question mark at the end
+    codeCreate();
+    cCode.addAll(aCode);
+    cCode.addAll(bCode);
+    cCode.add(true);
+    res &= t.checkExpect(abcdef.decode(cCode), "cab?");
+    
+    return res;
+  }
  
- boolean testMergeAll(Tester t) {
-   boolean res = true;
-   
-   // generic merge all
-   
-   res &= t.checkExpect(
-       abcdef.mergeAll(new ArrayList<ABranch>(Arrays.asList(b, f, c, d, a, e))),
-       fEADCBF);
-   
-   // intermediate merge all
-   
-   res &= t.checkExpect(
-       abcdef.mergeAll(new ArrayList<ABranch>(Arrays.asList(c, fBF, d, a, e))),
-       fEADCBF);
-   
-   // final merge all
-
-   res &= t.checkExpect(
-       abcdef.mergeAll(new ArrayList<ABranch>(Arrays.asList(e, fADCBF))),
-       new Forest(e, fADCBF));
-   
-   return res;
- }
+  boolean testMergeAll(Tester t) {
+    boolean res = true;
+    
+    // generic merge all
+    
+    res &= t.checkExpect(
+        abcdef.mergeAll(new ArrayList<ABranch>(Arrays.asList(b, f, c, d, a, e))),
+        f5);
+    
+    // intermediate merge all
+    
+    res &= t.checkExpect(
+        abcdef.mergeAll(new ArrayList<ABranch>(Arrays.asList(c, d, f1, a, e))),
+        f5);
+    
+    // final merge all
+ 
+    res &= t.checkExpect(
+        abcdef.mergeAll(new ArrayList<ABranch>(Arrays.asList(e, f4))),
+        new Forest(e, f4));
+    
+    return res;
+  }
 
   // tests the sortInto method
   boolean testSortInto(Tester t) {
     boolean res = true;
 
     // tests adding to the front
-    ArrayList<ABranch> sorted = new ArrayList<ABranch>(Arrays.asList(f, a, e));
+    ArrayList<ABranch> sorted = new ArrayList<ABranch>(Arrays.asList(a, e));
     abcdef.sortInto(sorted, b);
-    ArrayList<ABranch> sortedNew = new ArrayList<ABranch>(Arrays.asList(b, f, a, e));
+    ArrayList<ABranch> sortedNew = new ArrayList<ABranch>(Arrays.asList(b, a, e));
     res &= t.checkExpect(sorted, sortedNew);
 
     // tests adding in the middle
@@ -634,7 +639,7 @@ class ExamplesHuffman {
     return res;
   }
 
-//tests the generateBranchArray method
+  //tests the generateBranchArray method
   boolean testGenerateBranchArray(Tester t) {
     ArrayList<ABranch> result = new ArrayList<ABranch>(Arrays.asList(b, f, c, d, a, e));
     return t.checkExpect(abcdef.generateBranchArray(aTof, aTofFre), result);
